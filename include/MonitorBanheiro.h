@@ -1,6 +1,11 @@
 #pragma once
 
-void corintianoQuerEntrar();
-void conrintianoSai();
-void palmeirenseQuerEntrar();
-void palmeirenseSai();
+typedef struct monitor Monitor;
+
+Monitor *monitor_init(int n);
+void monitor_free(Monitor *monitor);
+
+void corintianoQuerEntrar(Monitor *monitor);
+void conrintianoSai(Monitor *monitor);
+void palmeirenseQuerEntrar(Monitor *monitor);
+void palmeirenseSai(Monitor *monitor);
