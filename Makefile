@@ -1,4 +1,4 @@
-EXECUTABLE_NAME = t2
+EXECUTABLE_NAME = trabalho2
 
 all: 
 	@ gcc -c src/*.c

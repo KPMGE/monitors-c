@@ -24,20 +24,18 @@ Monitor *monitor_init(int n) {
 
 void corintianoQuerEntrar(Monitor *monitor) {
   pthread_mutex_lock(&monitor->bathroom_mutex);
-  printf("amount corintianos: %d\n", monitor->amount_corintianos);
-  printf("amount palmeirenses: %d\n", monitor->amount_palmeirenses);
-  printf("-------------------------------------------------\n\n");
 
   monitor->corintianos_on_queue++;
   int total_people_on_bathroom = monitor->amount_corintianos + monitor->amount_palmeirenses;
   while (monitor->amount_palmeirenses != 0 || total_people_on_bathroom >= monitor->amount_vacancies) {
-    printf("CORINTIANO WAITING...\n");
-    printf("corintianos_on_queue: %d\n", monitor->corintianos_on_queue);
     pthread_cond_wait(&monitor->bathroom_cond, &monitor->bathroom_mutex);
   }
 
   monitor->corintianos_on_queue--;
   monitor->amount_corintianos++;
+
+  printf("Corintianos no banheiro: %d\n", monitor->amount_corintianos);
+  printf("Palmeirenses no banheiro: %d\n", monitor->amount_palmeirenses);
   pthread_mutex_unlock(&monitor->bathroom_mutex);
 }
 
@@ -46,17 +44,10 @@ void conrintianoSai(Monitor *monitor) {
   monitor->amount_corintianos--;
   pthread_cond_signal(&monitor->bathroom_cond);
   pthread_mutex_unlock(&monitor->bathroom_mutex);
-
-  printf("amount corintianos: %d\n", monitor->amount_corintianos);
-  printf("amount palmeirenses: %d\n", monitor->amount_palmeirenses);
-  printf("-------------------------------------------------\n\n");
 }
 
 void palmeirenseQuerEntrar(Monitor *monitor) {
   pthread_mutex_lock(&monitor->bathroom_mutex);
-  printf("amount corintianos: %d\n", monitor->amount_corintianos);
-  printf("amount palmeirenses: %d\n", monitor->amount_palmeirenses);
-  printf("-------------------------------------------------\n\n");
 
   int total_people_on_bathroom = monitor->amount_corintianos + monitor->amount_palmeirenses;
   while (
@@ -64,13 +55,14 @@ void palmeirenseQuerEntrar(Monitor *monitor) {
     || total_people_on_bathroom >= monitor->amount_vacancies 
     || monitor->corintianos_on_queue != 0
   ) {
-    printf("PALMEIRENSE WAITING...\n");
-    printf("corintianos_on_queue: %d\n", monitor->corintianos_on_queue);
     pthread_cond_signal(&monitor->bathroom_cond);
     pthread_cond_wait(&monitor->bathroom_cond, &monitor->bathroom_mutex);
   }
 
   monitor->amount_palmeirenses++;
+
+  printf("Corintianos no banheiro: %d\n", monitor->amount_corintianos);
+  printf("Palmeirenses no banheiro: %d\n", monitor->amount_palmeirenses);
   pthread_mutex_unlock(&monitor->bathroom_mutex);
 }
 
@@ -80,10 +72,6 @@ void palmeirenseSai(Monitor *monitor) {
   monitor->amount_palmeirenses--;
   pthread_cond_signal(&monitor->bathroom_cond);
   pthread_mutex_unlock(&monitor->bathroom_mutex);
-
-  printf("amount corintianos: %d\n", monitor->amount_corintianos);
-  printf("amount palmeirenses: %d\n", monitor->amount_palmeirenses);
-  printf("-------------------------------------------------\n\n");
 }
 
 void monitor_free(Monitor *monitor) {
